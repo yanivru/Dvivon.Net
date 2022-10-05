@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Dvivon.Net": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\Yaniv\\AppData\\Local\\Temp\\ProccessToDump.DMP"
+    }
+  }
+}
