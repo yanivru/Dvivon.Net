@@ -4,3 +4,4 @@ var nestedObjects = Enumerable.Range(1, 1000).Select(x => new NestedObject()).To
 
 Console.WriteLine("Objects created. Take dump now.");
 Console.ReadLine();
+Console.WriteLine(nestedObjects.Count);

@@ -23,13 +23,23 @@ using (var dataTarget = DataTarget.LoadDump(commandLineArgs[1]))
 
     var objectsPerType = objects.ToLookup(x => x.Type?.Name ?? "", x => new DumpObject(x.Type?.Name ?? "", x.Size, GetRefencedTypesNames(x).ToArray()));
 
-    var typesStatistics = objectsPerType.Select(x => new DumpType(x.Key, x.Count(), x.Sum(y => (decimal)y.Size)));
+    WriteTypesCsv(objectsPerType);
 
-    using (var writer = new StreamWriter("Types.csv"))
+    WriteReferencesCsv(objectsPerType);
+}
+
+void WriteReferencesCsv(ILookup<string, DumpObject> objectsPerType)
+{
+    var referencesStatistics = objectsPerType.SelectMany(objectsByType => objectsByType
+                                                                            .SelectMany(x => x.ReferencedTypes)
+                                                                            .GroupBy(referenceType => referenceType)
+                                                                            .Select(z => new DumpReference(objectsByType.Key, z.Key, z.Count())));
+
+    using (var writer = new StreamWriter("References.csv"))
     {
         using (CsvWriter csvWriter = new(writer, CultureInfo.InvariantCulture))
         {
-            csvWriter.WriteRecords(typesStatistics);
+            csvWriter.WriteRecords(referencesStatistics);
         }
     }
 }
@@ -39,16 +49,15 @@ static IEnumerable<string> GetRefencedTypesNames(ClrObject x)
     return x.EnumerateReferences().Select(y => y.Type?.Name ?? "");
 }
 
-class DumpType
+static void WriteTypesCsv(ILookup<string, DumpObject> objectsPerType)
 {
-    public string Name { get; }
-    public int Count { get; }
-    public decimal Size { get; }
+    var typesStatistics = objectsPerType.Select(x => new DumpType(x.Key, x.Count(), x.Sum(y => (decimal)y.Size)));
 
-    public DumpType(string typeName, int count, decimal size)
+    using (var writer = new StreamWriter("Types.csv"))
     {
-        Name = typeName;
-        Count = count;
-        Size = size;
+        using (CsvWriter csvWriter = new(writer, CultureInfo.InvariantCulture))
+        {
+            csvWriter.WriteRecords(typesStatistics);
+        }
     }
 }
