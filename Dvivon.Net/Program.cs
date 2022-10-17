@@ -1,9 +1,7 @@
 ﻿using CsvHelper;
-using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.Diagnostics.Runtime;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 
 Console.WriteLine("Starting memory dump essence extraction...");
 
